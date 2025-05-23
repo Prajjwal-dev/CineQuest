@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineQuest | By Prajjwal Maharjan</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <header>
+    <h1>CineQuest</h1>
+    <p>Discover Movies | Powered by TMDB API | By Prajjwal Maharjan</p>
+    <button id="toggleTheme">Toggle Theme</button>
+  </header>
+
+  <section id="controls">
+    <input type="text" id="searchInput" placeholder="Search for a movie..." />
+    <button id="searchBtn">Search</button>
+    <select id="genreSelect">
+      <option value="">All Genres</option>
+    </select>
+    <select id="categorySelect">
+      <option value="trending">Trending</option>
+      <option value="top_rated">Top Rated</option>
+      <option value="upcoming">Upcoming</option>
+    </select>
+  </section>
+
+  <div class="movie-container" id="movieContainer"></div>
+  <button id="loadMoreBtn">Load More</button>
+
+  <h2>My Favorite Movies</h2>
+  <div class="movie-container" id="favoriteContainer"></div>
+
+<footer>
+  <p>Built with ❤️ by <strong>Prajjwal Maharjan</strong></p>
+  <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">
+    <img src="logo.jpeg" 
+         alt="TMDB" height="20" />TMDB</a>
+  </p>
+</footer>
+
+
+  <div id="modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close-button" id="closeModal">&times;</span>
+      <div id="modalDetails"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
