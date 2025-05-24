@@ -7,10 +7,31 @@ body {
   transition: background-color 0.3s, color 0.3s;
 }
 
-body.light-mode {
-  background-color: #f9f9f9;
-  color: #121212;
+body.netflix-theme {
+    background-color: #141414;
+    color: #e50914;
 }
+
+body.imdb-theme {
+    background-color: #000;
+    color: #f5c518;
+}
+
+body.google-theme {
+    background-color: #fff;
+    color: #4285f4;
+}
+
+body.dark-theme {
+    background-color: #121212;
+    color: #ffffff;
+}
+
+body.light-theme {
+    background-color: #ffffff;
+    color: #000000;
+}
+
 
 header {
   background: linear-gradient(to right, #ff416c, #ff4b2b);

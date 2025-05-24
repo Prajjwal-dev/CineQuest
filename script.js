@@ -17,6 +17,34 @@ const modal = document.getElementById('modal');
 const modalDetails = document.getElementById('modalDetails');
 const closeModal = document.getElementById('closeModal');
 
+const themeSelector = document.getElementById('themeSelector');
+themeSelector.addEventListener('change', (e) => {
+    const theme = e.target.value;
+
+    document.body.className = ''; // Clear existing theme
+    document.body.classList.add(`${theme}-theme`);
+});
+
+genreSelect.onchange = () => {
+  currentGenre = genreSelect.value;
+  searchInput.value = '';
+  movieContainer.innerHTML = '';
+  currentPage = 1;
+  fetchMovies();
+};
+
+categorySelect.onchange = () => {
+  currentCategory = categorySelect.value;
+  currentGenre = ''; // Reset genre when category changes
+  genreSelect.value = '';
+  searchInput.value = '';
+  movieContainer.innerHTML = '';
+  currentPage = 1;
+  fetchMovies();
+};
+
+
+
 async function fetchGenres() {
   const res = await fetch(`${API_BASE}/genre/movie/list?api_key=${API_KEY}`);
   const data = await res.json();
@@ -30,19 +58,22 @@ async function fetchGenres() {
 
 async function fetchMovies(page = 1) {
   let url;
+
   if (searchInput.value) {
     url = `${API_BASE}/search/movie?api_key=${API_KEY}&query=${searchInput.value}&page=${page}`;
+  } else if (currentGenre) {
+    url = `${API_BASE}/discover/movie?api_key=${API_KEY}&with_genres=${currentGenre}&page=${page}`;
   } else if (currentCategory === 'trending') {
     url = `${API_BASE}/trending/movie/day?api_key=${API_KEY}&page=${page}`;
   } else {
     url = `${API_BASE}/movie/${currentCategory}?api_key=${API_KEY}&page=${page}`;
   }
-  if (currentGenre) url += `&with_genres=${currentGenre}`;
 
   const res = await fetch(url);
   const data = await res.json();
   displayMovies(data.results);
 }
+
 
 function displayMovies(movies) {
   movies.forEach(movie => {
@@ -59,15 +90,34 @@ function displayMovies(movies) {
 }
 
 async function showDetails(movieId) {
-  const res = await fetch(`${API_BASE}/movie/${movieId}?api_key=${API_KEY}&append_to_response=videos`);
-  const movie = await res.json();
+  const [movieRes, creditsRes] = await Promise.all([
+    fetch(`${API_BASE}/movie/${movieId}?api_key=${API_KEY}&append_to_response=videos`),
+    fetch(`${API_BASE}/movie/${movieId}/credits?api_key=${API_KEY}`)
+  ]);
+  
+  const movie = await movieRes.json();
+  const credits = await creditsRes.json();
+
   const trailer = movie.videos.results.find(v => v.type === 'Trailer');
+  const topCast = credits.cast.slice(0, 3).map(actor => actor.name).join(', ');
+  const director = credits.crew.find(p => p.job === 'Director');
+
   modalDetails.innerHTML = `
     <h2>${movie.title}</h2>
+    <p><strong>Director:</strong> ${director ? `<a href="#" onclick="searchPerson('${director.name}')">${director.name}</a>` : 'N/A'}</p>
+    <p><strong>Top Cast:</strong> ${topCast}</p>
     <p>${movie.overview}</p>
-    ${trailer ? `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${trailer.key}" frameborder="0" allowfullscreen></iframe>` : 'No trailer available'}
+    ${trailer ? `<iframe id="trailer" width="100%" height="315" src="https://www.youtube.com/embed/${trailer.key}?autoplay=1" frameborder="0" allowfullscreen></iframe>` : 'No trailer available'}
   `;
   modal.style.display = 'block';
+}
+
+function searchPerson(name) {
+  searchInput.value = name;
+  modal.style.display = 'none';
+  movieContainer.innerHTML = '';
+  currentPage = 1;
+  fetchMovies();
 }
 
 function addToFavorites(movieId) {
@@ -96,6 +146,31 @@ async function loadFavorites() {
   }
 }
 
+
+async function showTrivia() {
+  const res = await fetch(`${API_BASE}/movie/top_rated?api_key=${API_KEY}&page=1`);
+  const data = await res.json();
+  const movie = data.results[Math.floor(Math.random() * data.results.length)];
+  
+  const question = `Which year was "${movie.title}" released?`;
+  const correct = movie.release_date.split('-')[0];
+  const options = shuffle([correct, correct - 1, correct - 2, correct - 3]);
+
+  document.getElementById('triviaBox').innerHTML = `
+    <p><strong>${question}</strong></p>
+    ${options.map(y => `<button onclick="checkAnswer('${y}', '${correct}')">${y}</button>`).join('')}
+  `;
+}
+
+function checkAnswer(answer, correct) {
+  alert(answer === correct ? '✅ Correct!' : `❌ Wrong! The correct answer is ${correct}`);
+}
+
+function shuffle(arr) {
+  return arr.sort(() => 0.5 - Math.random());
+}
+
+
 searchBtn.onclick = () => {
   movieContainer.innerHTML = '';
   currentPage = 1;
@@ -116,9 +191,6 @@ categorySelect.onchange = () => {
   fetchMovies();
 };
 
-toggleTheme.onclick = () => {
-  document.body.classList.toggle('light-mode');
-};
 
 loadMoreBtn.onclick = () => {
   currentPage++;
@@ -127,7 +199,9 @@ loadMoreBtn.onclick = () => {
 
 closeModal.onclick = () => {
   modal.style.display = 'none';
+  modalDetails.innerHTML = ''; // remove trailer
 };
+
 
 window.onclick = e => {
   if (e.target === modal) modal.style.display = 'none';

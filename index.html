@@ -11,7 +11,14 @@
   <header>
     <h1>CineQuest</h1>
     <p>Discover Movies | Powered by TMDB API | By Prajjwal Maharjan</p>
-    <button id="toggleTheme">Toggle Theme</button>
+    <select id="themeSelector">
+    <option value="netflix">Netflix</option>
+    <option value="imdb">IMDb</option>
+    <option value="google">Google</option>
+    <option value="dark">Dark</option>
+    <option value="light">Light</option>
+</select>
+
   </header>
 
   <section id="controls">
@@ -25,6 +32,12 @@
       <option value="top_rated">Top Rated</option>
       <option value="upcoming">Upcoming</option>
     </select>
+    <div>
+</div>
+
+<button onclick="showTrivia()">🎬 Movie Trivia</button>
+<div id="triviaBox"></div>
+
   </section>
 
   <div class="movie-container" id="movieContainer"></div>
@@ -35,12 +48,15 @@
 
 <footer>
   <p>Built with ❤️ by <strong>Prajjwal Maharjan</strong></p>
-  <p>Powered by <a href="https://www.themoviedb.org/" target="_blank">
-    <img src="logo.jpeg" 
-         alt="TMDB" height="20" />TMDB</a>
+  <p>
+    This product uses the TMDB API but is not endorsed or certified by TMDB.
+    <a href="https://www.themoviedb.org/" target="_blank" rel="noopener">
+      <img src="logo.jpeg"
+           alt="TMDB Logo"
+           height="20" />TMDB
+    </a>
   </p>
 </footer>
-
 
   <div id="modal" class="modal" style="display: none;">
     <div class="modal-content">
